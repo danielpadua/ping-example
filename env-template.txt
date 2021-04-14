@@ -1,0 +1,11 @@
+# To override the default server ports, copy this file to .env and edit the variables below.
+PDG_TUTORIALS_DG_PORT=7443
+PDG_TUTORIALS_PAP_PORT=8443
+PDG_TUTORIALS_CONSOLE_PORT=5443
+PDG_TUTORIALS_TESTAPI_PORT=5000
+
+# You should not need to modify the below variables
+PDG_TUTORIALS_PROFILE_BRANCH=8.2
+PDG_TUTORIALS_DEVOPS_REGISTRY=docker.io/pingidentity
+PDG_TUTORIALS_DEVOPS_TAG=8.2.0.0-alpine-java11-edge
+

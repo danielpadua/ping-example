@@ -1,0 +1,80 @@
+version: "2.4"
+
+services:
+  pingdatagovernance:
+    image: ${PDG_TUTORIALS_DEVOPS_REGISTRY}/pingdatagovernance:${PDG_TUTORIALS_DEVOPS_TAG}
+    container_name: pingdatagovernance
+    environment:
+      - SERVER_PROFILE_URL=${PDG_TUTORIALS_PROFILE_URL:-https://github.com/pingidentity/pdg-tutorials.git}
+      - SERVER_PROFILE_PATH=server-profiles/pingdatagovernance
+      - SERVER_PROFILE_BRANCH=${PDG_TUTORIALS_PROFILE_BRANCH:-main}
+      - PDG_TUTORIALS_PAP_PORT=${PDG_TUTORIALS_PAP_PORT:-8443}  
+    env_file:
+      - ${HOME}/.pingidentity/devops
+    ports:
+      - "${PDG_TUTORIALS_DG_PORT:-7443}:443"
+    volumes:
+      - ./pingdatagovernance.lic:/opt/server/PingDataGovernance.lic
+      - pingdatagovernance-out:/opt/out
+    networks:
+      - pingnet-dmz
+      - pingnet-internal
+
+  pingdatagovernancepap:
+    image: ${PDG_TUTORIALS_DEVOPS_REGISTRY}/pingdatagovernancepap:${PDG_TUTORIALS_DEVOPS_TAG}
+    container_name: pingdatagovernancepap
+    environment:
+      - SERVER_PROFILE_URL=${PDG_TUTORIALS_PROFILE_URL:-https://github.com/pingidentity/pdg-tutorials.git}
+      - SERVER_PROFILE_PATH=server-profiles/pingdatagovernancepap
+      - HTTPS_PORT=8443
+      - SERVER_PROFILE_BRANCH=${PDG_TUTORIALS_PROFILE_BRANCH:-main}
+    env_file:
+      - ${HOME}/.pingidentity/devops
+    ports:
+      - "${PDG_TUTORIALS_PAP_PORT:-8443}:8443"
+    volumes:
+      - ./pingdatagovernance.lic:/opt/server/PingDataGovernance.lic
+      - pingdatagovernancepap-out:/opt/out
+    networks:
+      - pingnet-dmz
+
+  pingdirectory:
+    image: ${PDG_TUTORIALS_DEVOPS_REGISTRY}/pingdirectory:${PDG_TUTORIALS_DEVOPS_TAG}
+    container_name: pingdirectory
+    environment:
+      - SERVER_PROFILE_URL=${PDG_TUTORIALS_PROFILE_URL:-https://github.com/pingidentity/pdg-tutorials.git}
+      - SERVER_PROFILE_PATH=server-profiles/pingdirectory
+    env_file:
+      - ${HOME}/.pingidentity/devops
+    volumes:
+      - ./pingdirectory.lic:/opt/server/PingDirectory.lic
+      - pingdirectory-out:/opt/out
+    networks:
+      - pingnet-internal
+
+  pingdataconsole:
+    image: ${PDG_TUTORIALS_DEVOPS_REGISTRY}/pingdataconsole:${PDG_TUTORIALS_DEVOPS_TAG}
+    container_name: pingdataconsole
+    ports:
+      - "${PDG_TUTORIALS_CONSOLE_PORT:-5443}:8443"
+    networks:
+      - pingnet-internal
+
+  testapi:
+    image: ${PDG_TUTORIALS_DEVOPS_REGISTRY}/testapi
+    build:
+      context: .
+      dockerfile: test-api/Dockerfile
+    ports:
+      - "${PDG_TUTORIALS_TESTAPI_PORT:-5000}:5000"
+    networks:
+      - pingnet-dmz
+
+networks:
+  pingnet-internal:
+  pingnet-dmz:
+
+volumes:
+  pingdatagovernance-out:
+  pingdatagovernancepap-out:
+  pingdirectory-out:
